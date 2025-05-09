@@ -1,6 +1,8 @@
 package com.proyecto.transportes.entidades;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -24,10 +26,22 @@ public class Ruta {
 	@Column
 	private String origen;
 	@Column
-	private LocalDate horarioSalida;
+	private LocalTime horarioSalida;
 	@Column
-	private LocalDate horarioLlegada;
+	private LocalTime horarioLlegada;
+	@Column
+	private LocalDate fechaViaje;
+
+
 	
+	public LocalDate getFechaViaje() {
+		return fechaViaje;
+	}
+
+	public void setFechaViaje(LocalDate fechaViaje) {
+		this.fechaViaje = fechaViaje;
+	}
+
 	@OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Autobus> autobuses;
 
@@ -55,19 +69,19 @@ public class Ruta {
 		this.origen = origen;
 	}
 
-	public LocalDate getHorarioSalida() {
+	public LocalTime getHorarioSalida() {
 		return horarioSalida;
 	}
 
-	public void setHorarioSalida(LocalDate horarioSalida) {
+	public void setHorarioSalida(LocalTime horarioSalida) {
 		this.horarioSalida = horarioSalida;
 	}
 
-	public LocalDate getHorarioLlegada() {
+	public LocalTime getHorarioLlegada() {
 		return horarioLlegada;
 	}
 
-	public void setHorarioLlegada(LocalDate horarioLlegada) {
+	public void setHorarioLlegada(LocalTime horarioLlegada) {
 		this.horarioLlegada = horarioLlegada;
 	}
 

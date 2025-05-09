@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="pasajero")
+@Table(name = "pasajero")
 public class Pasajero {
 
 	@Id
@@ -19,17 +19,19 @@ public class Pasajero {
 	private String nombre;
 	@Column
 	private String apellido;
-	@Column
+	@Column(unique = true)
 	private String email;
-	
-		
+
+	private String contraseña;
+
+
 
 	public Pasajero() {
 		super();
 	}
 
 	public Pasajero(String nombre, String apellido, String email) {
-		
+
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.email = email;
@@ -65,6 +67,13 @@ public class Pasajero {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getContraseña() {
+		return contraseña;
+	}
+
+	public void setContraseña(String contraseña) {
+		this.contraseña = contraseña;
 	}
 
 }

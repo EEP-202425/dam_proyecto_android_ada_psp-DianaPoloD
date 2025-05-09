@@ -30,6 +30,12 @@ public class RutaController {
     public ResponseEntity<Ruta> getById(@PathVariable Long id) {
         return service.getById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
+    
+    @GetMapping("/buscar")
+    public List<Ruta> buscar(@RequestParam String origen, @RequestParam String destino) {
+        return service.buscarPorOrigenYDestino(origen, destino);
+    }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Ruta> update(@PathVariable Long id, @RequestBody Ruta nueva) {
