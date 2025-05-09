@@ -1,5 +1,8 @@
 package com.example.transportediana.clases
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Autobus(
     val id: Long? = null,
     val tipo: String,

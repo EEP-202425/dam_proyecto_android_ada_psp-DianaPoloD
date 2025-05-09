@@ -22,7 +22,7 @@ public class Autobus {
 	private int capacidad;
 	
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ruta_id", nullable = false)
 	private Ruta ruta;
 
