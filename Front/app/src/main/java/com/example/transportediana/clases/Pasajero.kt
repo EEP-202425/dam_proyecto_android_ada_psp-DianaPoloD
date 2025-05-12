@@ -1,8 +1,6 @@
 package com.example.transportediana.clases
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Pasajero(
     val id: Long? = null,
     val nombre: String,

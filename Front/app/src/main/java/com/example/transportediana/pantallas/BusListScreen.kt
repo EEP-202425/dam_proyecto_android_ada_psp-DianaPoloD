@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.example.transportediana.viewmodel.UiState
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,12 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.transportediana.clases.AutobusconRuta
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import java.time.LocalTime
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BusListScreen(viewModel: AutobusViewModel) {
+fun BusListScreen(viewModel: AutobusViewModel,
+    onReservarClick: (Long) -> Unit
+){
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -84,20 +87,27 @@ fun BusListScreen(viewModel: AutobusViewModel) {
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text("${ruta.origen} → ${ruta.destino}")
                                         Text("🚌 Tipo: ${autobus.tipo}")
-                                        Text("⏰ Salida: ${ruta.horarioSalida}")
-                                        Text("👥 Capacidad: ${autobus.capacidad}")
+                                        Text("⏰ Llegada: ${ruta.horarioLlegada.substring(0,5)}")
+                                        Text("⏰ Salida: ${ruta.horarioSalida.substring(0,5)}")
+                                        Button(
+                                            onClick = { onReservarClick(autobus.id) },
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        ) {
+                                            Text("Reservar")
+                                        }
+                                    }
                                     }
                                 }
                             }
                         }
-                    }
+                    }  is UiState.Error -> {
+                val mensaje = (uiState as UiState.Error).message
+                Text("Error: $mensaje")
+            }
                 }
 
-                is UiState.Error -> {
-                    val mensaje = (uiState as UiState.Error).message
-                    Text("Error: $mensaje")
-                }
+
             }
         }
     } // <-- cierre de Scaffold
-}
+

@@ -19,18 +19,15 @@ class AutobusViewModel : ViewModel() {
             _uiState.value = UiState.Loading
             try {
                 val autobusesResp = AutobusesApi.retrofitService.getAll()
-                val rutasResp = RutasApi.retrofitService.getAll()
 
-                if (autobusesResp.isSuccessful && rutasResp.isSuccessful) {
+                if (autobusesResp.isSuccessful) {
                     val fechaHoy = LocalDate.now().toString()
                     val autobuses = autobusesResp.body() ?: emptyList()
-                    val rutas = rutasResp.body() ?: emptyList()
 
-                    val filtrado = autobuses.mapNotNull { autobus ->
-                        val ruta = rutas.find { it.id == autobus.rutaId && it.fechaViaje == fechaHoy }
-                        ruta?.let {
-                            AutobusconRuta(autobus, it)
-                        }
+                    val filtrado = autobuses.filter { autobus ->
+                        autobus.ruta?.fechaViaje == fechaHoy
+                    }.map { autobus ->
+                        AutobusconRuta(autobus, autobus.ruta!!)
                     }
 
                     _uiState.value = UiState.Success(filtrado)
