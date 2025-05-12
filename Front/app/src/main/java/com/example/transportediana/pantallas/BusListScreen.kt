@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.transportediana.clases.AutobusconRuta
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import java.time.LocalTime
 
@@ -86,15 +87,20 @@ fun BusListScreen(viewModel: AutobusViewModel,
                                 ) {
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text("${ruta.origen} → ${ruta.destino}")
-                                        Text("🚌 Tipo: ${autobus.tipo}")
+                                        Text("🚌 ${autobus.tipo}")
                                         Text("⏰ Llegada: ${ruta.horarioLlegada.substring(0,5)}")
                                         Text("⏰ Salida: ${ruta.horarioSalida.substring(0,5)}")
                                         Button(
-                                            onClick = { onReservarClick(autobus.id) },
-                                            modifier = Modifier.padding(top = 8.dp)
+                                            onClick = {onReservarClick(autobus.id)},
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFF1A237E),
+                                                contentColor = Color.White
+                                            ),
+                                            modifier = Modifier.fillMaxWidth()
                                         ) {
-                                            Text("Reservar")
+                                            Text("Confirmar reserva")
                                         }
+
                                     }
                                     }
                                 }

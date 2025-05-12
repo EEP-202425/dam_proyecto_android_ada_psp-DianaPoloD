@@ -22,7 +22,7 @@ public class Pasajero {
 	@Column(unique = true)
 	private String email;
 
-	private String contraseña;
+	private String contrasena;
 
 
 
@@ -69,11 +69,11 @@ public class Pasajero {
 		this.email = email;
 	}
 	public String getContraseña() {
-		return contraseña;
+		return contrasena;
 	}
 
 	public void setContraseña(String contraseña) {
-		this.contraseña = contraseña;
+		this.contrasena = contraseña;
 	}
 
 }
