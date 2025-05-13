@@ -30,7 +30,8 @@ interface BilletesApiService {
 }
 
 object BilletesApi {
-    val retrofitService: PasajerosApiService by lazy {
-        RetroFitClient.retrofit.create(PasajerosApiService::class.java)
+    val retrofitService: BilletesApiService by lazy {
+        RetroFitClient.retrofit.create(BilletesApiService::class.java)
     }
 }
+

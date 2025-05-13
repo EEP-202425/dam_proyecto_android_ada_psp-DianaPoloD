@@ -1,22 +1,19 @@
-// MainActivity.kt
 package com.example.transportediana
 
-import AutobusViewModel
-import BusListScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.navigation.compose.rememberNavController
+import com.example.transportediana.navigation.AppNavHost
 import com.example.transportediana.ui.theme.TransporteDianaTheme
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: AutobusViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TransporteDianaTheme {
-                BusListScreen(viewModel = viewModel)
+                val navController = rememberNavController()
+                AppNavHost(navController = navController)
             }
         }
     }

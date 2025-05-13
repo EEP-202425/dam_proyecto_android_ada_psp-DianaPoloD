@@ -1,14 +1,13 @@
-
-import java.time.LocalDate
-
+import com.example.transportediana.clases.Autobus
+import com.example.transportediana.clases.Pasajero
 
 
 data class Billete(
     val id: Long? = null,
-    val pasajeroId: Long, // Usamos los IDs, no los objetos enteros
-    val autobusId: Long,
+    val pasajero: Pasajero, // Usamos los IDs, no los objetos enteros
+    val autobus: Autobus,
     val precio: Double,
-    val fechaCompra: LocalDate
+    val fechaCompra: String
 )
 
 
