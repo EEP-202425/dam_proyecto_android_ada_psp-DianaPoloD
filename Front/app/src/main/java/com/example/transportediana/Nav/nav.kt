@@ -1,4 +1,4 @@
-package com.example.transportediana.navigation
+package com.example.transportediana.nav
 
 import AutobusViewModel
 import BusListScreen
@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.transportediana.screens.ReservaBilleteScreen
+import com.example.transportediana.pantallas.ReservaBilleteScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {

@@ -1,4 +1,4 @@
-package com.example.transportediana.screens
+package com.example.transportediana.pantallas
 
 import Billete
 import androidx.compose.runtime.*
@@ -12,8 +12,8 @@ import com.example.transportediana.api.*
 import com.example.transportediana.clases.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,8 +25,11 @@ fun ReservaBilleteScreen(autobusId: Long) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf<String?>(null) }
+
+    var confirmacion by remember { mutableStateOf(false) }
+    var modoEditar by remember { mutableStateOf(false) }
+
+    var busReservado by remember { mutableStateOf<Autobus?>(null) }
 
     val scope = rememberCoroutineScope()
 
@@ -38,79 +41,126 @@ fun ReservaBilleteScreen(autobusId: Long) {
             )
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
-            OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
-            OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") }
+                )
+                OutlinedTextField(
+                    value = apellido,
+                    onValueChange = { apellido = it },
+                    label = { Text("Apellido") }
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") }
+                )
 
-            // Contraseña oculta
-            OutlinedTextField(
-                value = contrasena,
-                onValueChange = { contrasena = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation()//para que no se vea la contraseña
-            )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                val pasajero = Pasajero(
+                                    id = 0,
+                                    nombre = nombre,
+                                    apellido = apellido,
+                                    email = email
+                                )
 
-            Button(
-                onClick = {
-                    scope.launch {
-                        try {
-                            val pasajero = Pasajero(
-                                id = 0,
-                                nombre = nombre,
-                                apellido = apellido,
-                                email = email,
-                                contrasena = contrasena
-                            )
-                            val pasajeroResp = pasajeroApi.createPasajero(pasajero)
-                            val pasajeroCreado = pasajeroResp.body() ?: throw Exception("Error creando pasajero")
+                                val pasajeroResp = pasajeroApi.createPasajero(pasajero)
+                                val pasajeroCreado = pasajeroResp.body()
+                                    ?: throw Exception("Error creando pasajero")
 
-                            val autobusResp = autobusApi.getById(autobusId)
-                            val autobus = autobusResp.body() ?: throw Exception("No se encontró el autobús")
+                                val autobusResp = autobusApi.getById(autobusId)
+                                val autobus = autobusResp.body()
+                                    ?: throw Exception("No se encontró el autobús")
 
-                            val billete = Billete(
-                                pasajero = pasajeroCreado,
-                                autobus = autobus,
-                                precio = 15.0,
-                                fechaCompra = LocalDate.now().toString()
-                            )
+                                val billete = Billete(
+                                    pasajero = pasajeroCreado,
+                                    autobus = autobus,
+                                    precio = 15.0,
+                                    fechaCompra = LocalDate.now().toString()
+                                )
 
-                            val billeteResp = billeteApi.createBillete(billete)
+                                val billeteResp = billeteApi.createBillete(billete)
 
-                            if (billeteResp.isSuccessful) {
-                                mensaje = "🎉 ¡Billete reservado correctamente!"
-                                // Limpiar campos después de éxito
-                                nombre = ""
-                                apellido = ""
-                                email = ""
-                                contrasena = ""
-                            } else {
-                                mensaje = "Error al crear billete: código ${billeteResp.code()}"
+                                if (billeteResp.isSuccessful) {
+                                    busReservado = autobus
+                                    confirmacion = true
+                                    modoEditar = false
+                                }
+                            } catch (e: Exception) {
+                                // Aquí podrías mostrar un error con Snackbar o Toast si quieres
                             }
-                        } catch (e: Exception) {
-                            mensaje = "Error: ${e.message}"
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1A237E),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Confirmar reserva")
+                }
+            }
+            if (confirmacion && busReservado != null) {
+                AlertDialog(
+                    onDismissRequest = { confirmacion = false },
+                    title = { Text("🎟️ Billete reservado") },
+                    text = {
+                        if (!modoEditar) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text("🚌 Tipo de autobús: ${busReservado!!.tipo}")
+                                Text("📍 Ruta: ${busReservado!!.ruta?.origen} → ${busReservado!!.ruta?.destino}")
+                                Text("⏰ Salida: ${busReservado!!.ruta?.horarioSalida?.take(5)}")
+                                Divider()
+                                Text("👤 Nombre: $nombre")
+                                Text("👤 Apellido: $apellido")
+                                Text("📧 Email: $email")
+                                Spacer(modifier = Modifier.height(8.dp))
+                                IconButton(onClick = { modoEditar = true }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Editar datos")
+                                }
+                            }
+                        } else {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+                                OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
+                                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+                                Button(onClick = { modoEditar = false }) {
+                                    Text("Guardar cambios")
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            confirmacion = false
+                            busReservado = null
+                            nombre = ""
+                            apellido = ""
+                            email = ""
+                            modoEditar = false
+                        }) {
+                            Text("Aceptar")
                         }
                     }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1A237E),
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Confirmar reserva")
-            }
-
-            mensaje?.let {
-                Text(it, color = MaterialTheme.colorScheme.primary)
+                )
             }
         }
     }
 }
+
+

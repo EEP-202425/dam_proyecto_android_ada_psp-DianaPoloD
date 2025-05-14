@@ -21,14 +21,17 @@ class AutobusViewModel : ViewModel() {
                 val autobusesResp = AutobusesApi.retrofitService.getAll()
 
                 if (autobusesResp.isSuccessful) {
-                    val fechaHoy = LocalDate.now().toString()
                     val autobuses = autobusesResp.body() ?: emptyList()
+                    val fechaHoy = LocalDate.now()
 
                     val filtrado = autobuses.filter { autobus ->
-                        autobus.ruta?.fechaViaje == fechaHoy
+                        autobus.ruta?.fechaViaje?.let { fechaString ->
+                            LocalDate.parse(fechaString) == fechaHoy
+                        } ?: false
                     }.map { autobus ->
                         AutobusconRuta(autobus, autobus.ruta!!)
                     }
+
 
                     _uiState.value = UiState.Success(filtrado)
                 } else {
