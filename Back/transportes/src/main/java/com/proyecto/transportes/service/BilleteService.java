@@ -1,12 +1,14 @@
 package com.proyecto.transportes.service;
 
 import com.proyecto.transportes.entidades.Billete;
+import com.proyecto.transportes.entidades.Pasajero;
 import com.proyecto.transportes.repository.BilleteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BilleteService {
@@ -43,6 +45,13 @@ public class BilleteService {
         }
         return false;
     }
+    
+    public List<Pasajero> getPasajerosPorAutobus(Long autobusId) {
+        return repo.findById(autobusId).stream()
+                   .map(Billete::getPasajero)
+                   .collect(Collectors.toList());
+    }
+
 
     
     

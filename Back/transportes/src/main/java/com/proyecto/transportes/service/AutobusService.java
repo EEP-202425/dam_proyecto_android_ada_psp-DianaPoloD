@@ -15,14 +15,9 @@ public class AutobusService {
 	private AutobusRepository repo;
 
 	public List<Autobus> getAll() {
-	    List<Autobus> lista = repo.findAll();
-	    lista.forEach(autobus -> {
-	        if (autobus.getRuta() != null) {
-	            autobus.getRuta().setFechaViaje(java.time.LocalDate.now());
-	        }
-	    });
-	    return lista;
+	    return repo.findAll();
 	}
+
 
 
 	public Autobus save(Autobus autobus) {

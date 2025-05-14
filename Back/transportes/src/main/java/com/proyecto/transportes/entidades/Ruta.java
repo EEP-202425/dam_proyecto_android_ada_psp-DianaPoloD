@@ -1,12 +1,8 @@
 package com.proyecto.transportes.entidades;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,15 +31,7 @@ public class Ruta {
 	private LocalDate fechaViaje;
 
 
-	@JsonGetter("fechaViaje")//para que pueda funcionar el local 
-	public LocalDate getFechaViaje() {
-	    return LocalDate.now(); // <-- simula que siempre es hoy
-	}
 
-
-	public void setFechaViaje(LocalDate fechaViaje) {
-		this.fechaViaje = fechaViaje;
-	}
 
 	@OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Autobus> autobuses;
@@ -87,5 +75,12 @@ public class Ruta {
 	public void setHorarioLlegada(LocalTime horarioLlegada) {
 		this.horarioLlegada = horarioLlegada;
 	}
+	
+	public LocalDate getFechaViaje() {
+		return this.fechaViaje;
+	}
 
+	public void setFechaViaje(LocalDate fechaViaje) {
+		this.fechaViaje = fechaViaje;
+	}
 }

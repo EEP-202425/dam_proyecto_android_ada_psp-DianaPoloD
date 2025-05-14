@@ -1,5 +1,8 @@
 package com.proyecto.transportes.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Autobus {
@@ -25,6 +29,20 @@ public class Autobus {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ruta_id", nullable = false)
 	private Ruta ruta;
+	
+	@OneToMany(mappedBy = "autobus", cascade = CascadeType.ALL, fetch = FetchType.LAZY) //para poder asociar billetes
+	@JsonIgnore
+	private java.util.List<Billete> billetes;
+
+	public java.util.List<Billete> getBilletes() {
+	    return billetes;
+	}
+
+	public void setBilletes(java.util.List<Billete> billetes) {
+	    this.billetes = billetes;
+	}
+
+	
 
 	public long getId() {
 		return id;

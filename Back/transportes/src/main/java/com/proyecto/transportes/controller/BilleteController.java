@@ -1,6 +1,7 @@
 package com.proyecto.transportes.controller;
 
 import com.proyecto.transportes.entidades.Billete;
+import com.proyecto.transportes.entidades.Pasajero;
 import com.proyecto.transportes.service.BilleteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,11 @@ public class BilleteController {
         return ResponseEntity.notFound().build();
     }
     
+    @GetMapping("/pasajeros/autobus/{id}")
+    public List<Pasajero> getPasajerosPorAutobus(@PathVariable Long id) {
+        return service.getPasajerosPorAutobus(id);
+    }
+
     
 
 }
