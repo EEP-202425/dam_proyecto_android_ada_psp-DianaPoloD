@@ -27,7 +27,7 @@ public class Autobus {
 	
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "ruta_id", nullable = false)
+	@JoinColumn(name = "ruta_id")
 	private Ruta ruta;
 	
 	@OneToMany(mappedBy = "autobus", cascade = CascadeType.ALL, fetch = FetchType.LAZY) //para poder asociar billetes

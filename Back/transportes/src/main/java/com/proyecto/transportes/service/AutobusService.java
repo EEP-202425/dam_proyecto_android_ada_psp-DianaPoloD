@@ -15,10 +15,8 @@ public class AutobusService {
 	private AutobusRepository repo;
 
 	public List<Autobus> getAll() {
-	    return repo.findAll();
+		return repo.findAll();
 	}
-
-
 
 	public Autobus save(Autobus autobus) {
 		return repo.save(autobus);

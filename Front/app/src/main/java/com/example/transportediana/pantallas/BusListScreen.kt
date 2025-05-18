@@ -90,6 +90,8 @@ fun BusListScreen(viewModel: AutobusViewModel,
                                         Text("🚌 ${autobus.tipo}")
                                         Text("⏰ Llegada: ${ruta.horarioLlegada.substring(0,5)}")
                                         Text("⏰ Salida: ${ruta.horarioSalida.substring(0,5)}")
+                                        Text("📅 Fecha: ${ruta.fechaViaje}")
+
                                         Button(
                                             onClick = {onReservarClick(autobus.id)},
                                             colors = ButtonDefaults.buttonColors(
@@ -115,5 +117,4 @@ fun BusListScreen(viewModel: AutobusViewModel,
 
             }
         }
-    } // <-- cierre de Scaffold
-
+    }

@@ -29,8 +29,7 @@ public class Pasajero {
 	private String contrasena;
 	
 	 @OneToMany(mappedBy = "pasajero", cascade = CascadeType.ALL, orphanRemoval = true)
-	    private List<Billete> billetes;
-
+	  private List<Billete> billetes;
 
 
 	public Pasajero() {

@@ -35,7 +35,7 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long) {
 
     val scope = rememberCoroutineScope()
 
-    // 🆕 Estado para mostrar mensajes flotantes (snackbar)
+    // Estado para mostrar mensajes flotantes (snackbar)
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(

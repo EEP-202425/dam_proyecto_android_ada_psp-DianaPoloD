@@ -28,9 +28,12 @@ class AutobusViewModel : ViewModel() {
                         autobus.ruta?.fechaViaje?.let { fechaString ->
                             LocalDate.parse(fechaString) == fechaHoy
                         } ?: false
-                    }.map { autobus ->
-                        AutobusconRuta(autobus, autobus.ruta!!)
                     }
+                        .take(3) // 👈 solo los primeros 3
+                        .map { autobus ->
+                            AutobusconRuta(autobus, autobus.ruta!!)
+                        }
+
 
 
                     _uiState.value = UiState.Success(filtrado)
