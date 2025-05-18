@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.transportediana.pantallas.ConfirmacionScreen
 import com.example.transportediana.pantallas.ReservaBilleteScreen
 
 @Composable
@@ -14,7 +15,7 @@ fun AppNavHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "listado") {
 
         composable("listado") {
-            val viewModel: AutobusViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val viewModel: AutobusViewModel = viewModel()
             BusListScreen(
                 viewModel = viewModel,
                 onReservarClick = { autobusId ->
@@ -25,7 +26,12 @@ fun AppNavHost(navController: NavHostController) {
 
         composable("reserva/{autobusId}") { backStackEntry ->
             val autobusId = backStackEntry.arguments?.getString("autobusId")?.toLongOrNull() ?: 0L
-            ReservaBilleteScreen(autobusId = autobusId)
+            ReservaBilleteScreen(navController = navController, autobusId = autobusId)
+        }
+
+        composable("confirmacion") {
+            ConfirmacionScreen()
         }
     }
 }
+

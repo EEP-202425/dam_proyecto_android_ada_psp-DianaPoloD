@@ -14,10 +14,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservaBilleteScreen(autobusId: Long) {
+fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
     val pasajeroApi = PasajerosApi.retrofitService
     val billeteApi = BilletesApi.retrofitService
     val autobusApi = AutobusesApi.retrofitService
@@ -30,6 +31,7 @@ fun ReservaBilleteScreen(autobusId: Long) {
     var modoEditar by remember { mutableStateOf(false) }
 
     var busReservado by remember { mutableStateOf<Autobus?>(null) }
+    var pasajeroCreado by remember { mutableStateOf<Pasajero?>(null) }
 
     val scope = rememberCoroutineScope()
 
@@ -80,7 +82,7 @@ fun ReservaBilleteScreen(autobusId: Long) {
                                 )
 
                                 val pasajeroResp = pasajeroApi.createPasajero(pasajero)
-                                val pasajeroCreado = pasajeroResp.body()
+                                pasajeroCreado = pasajeroResp.body()
                                     ?: throw Exception("Error creando pasajero")
 
                                 val autobusResp = autobusApi.getById(autobusId)
@@ -88,7 +90,7 @@ fun ReservaBilleteScreen(autobusId: Long) {
                                     ?: throw Exception("No se encontró el autobús")
 
                                 val billete = Billete(
-                                    pasajero = pasajeroCreado,
+                                    pasajero = pasajeroCreado!!,
                                     autobus = autobus,
                                     precio = 15.0,
                                     fechaCompra = LocalDate.now().toString()
@@ -101,6 +103,8 @@ fun ReservaBilleteScreen(autobusId: Long) {
                                     confirmacion = true
                                     modoEditar = false
                                 }
+
+
                             } catch (e: Exception) {
                                 // Aquí podrías mostrar un error con Snackbar o Toast si quieres
                             }
@@ -118,7 +122,7 @@ fun ReservaBilleteScreen(autobusId: Long) {
             if (confirmacion && busReservado != null) {
                 AlertDialog(
                     onDismissRequest = { confirmacion = false },
-                    title = { Text("🎟️ Billete reservado") },
+                    title = { Text("🎟️ Resumen del Billete") },
                     text = {
                         if (!modoEditar) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -139,7 +143,26 @@ fun ReservaBilleteScreen(autobusId: Long) {
                                 OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
                                 OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
                                 OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-                                Button(onClick = { modoEditar = false }) {
+                                Button(onClick = {
+                                    scope.launch {
+                                        try {
+                                            pasajeroCreado?.let { pasajero ->
+                                                val pasajeroActualizado = pasajero.copy(
+                                                    nombre = nombre,
+                                                    apellido = apellido,
+                                                    email = email
+                                                )
+                                                val response = pasajeroApi.updatePasajero(pasajero.id, pasajeroActualizado)
+                                                if (response.isSuccessful) {
+                                                    pasajeroCreado = pasajeroActualizado
+                                                    modoEditar = false
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            // Manejo de error general
+                                        }
+                                    }
+                                }) {
                                     Text("Guardar cambios")
                                 }
                             }
@@ -153,14 +176,17 @@ fun ReservaBilleteScreen(autobusId: Long) {
                             apellido = ""
                             email = ""
                             modoEditar = false
+                            navController.navigate("confirmacion") //solo despues de editar
                         }) {
-                            Text("Aceptar")
+                            Text("Confirmar")
                         }
                     }
+
                 )
             }
         }
     }
 }
+
 
 
