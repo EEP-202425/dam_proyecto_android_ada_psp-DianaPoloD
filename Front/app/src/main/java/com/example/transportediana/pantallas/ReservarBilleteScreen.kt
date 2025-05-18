@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
+fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long) {
     val pasajeroApi = PasajerosApi.retrofitService
     val billeteApi = BilletesApi.retrofitService
     val autobusApi = AutobusesApi.retrofitService
@@ -35,7 +35,12 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
 
     val scope = rememberCoroutineScope()
 
+    // 🆕 Estado para mostrar mensajes flotantes (snackbar)
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
+        // 🆕 Añadimos snackbarHost al Scaffold para poder mostrar los mensajes
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             SmallTopAppBar(
                 title = { Text("Reserva de Billete", color = Color.White) },
@@ -54,39 +59,19 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") }
-                )
-                OutlinedTextField(
-                    value = apellido,
-                    onValueChange = { apellido = it },
-                    label = { Text("Apellido") }
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") }
-                )
+                OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+                OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
+                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
 
                 Button(
                     onClick = {
                         scope.launch {
                             try {
-                                val pasajero = Pasajero(
-                                    id = 0,
-                                    nombre = nombre,
-                                    apellido = apellido,
-                                    email = email
-                                )
-
+                                val pasajero = Pasajero(0, nombre, apellido, email)
                                 val pasajeroResp = pasajeroApi.createPasajero(pasajero)
-                                pasajeroCreado = pasajeroResp.body()
-                                    ?: throw Exception("Error creando pasajero")
+                                pasajeroCreado = pasajeroResp.body() ?: throw Exception("Error creando pasajero")
 
-                                val autobusResp = autobusApi.getById(autobusId)
-                                val autobus = autobusResp.body()
+                                val autobus = autobusApi.getById(autobusId).body()
                                     ?: throw Exception("No se encontró el autobús")
 
                                 val billete = Billete(
@@ -103,10 +88,9 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                                     confirmacion = true
                                     modoEditar = false
                                 }
-
-
                             } catch (e: Exception) {
-                                // Aquí podrías mostrar un error con Snackbar o Toast si quieres
+                                // 🆕 Mostrar mensaje de error si la reserva falla
+                                snackbarHostState.showSnackbar("❌ Error al reservar: ${e.localizedMessage}")
                             }
                         }
                     },
@@ -119,10 +103,11 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                     Text("Confirmar reserva")
                 }
             }
+
             if (confirmacion && busReservado != null) {
                 AlertDialog(
                     onDismissRequest = { confirmacion = false },
-                    title = { Text("🎟️ Resumen del Billete") },
+                    title = { Text("🎟️ Resumen del billete") },
                     text = {
                         if (!modoEditar) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -134,6 +119,7 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                                 Text("👤 Apellido: $apellido")
                                 Text("📧 Email: $email")
                                 Spacer(modifier = Modifier.height(8.dp))
+
                                 IconButton(onClick = { modoEditar = true }) {
                                     Icon(Icons.Default.Edit, contentDescription = "Editar datos")
                                 }
@@ -147,19 +133,18 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                                     scope.launch {
                                         try {
                                             pasajeroCreado?.let { pasajero ->
-                                                val pasajeroActualizado = pasajero.copy(
-                                                    nombre = nombre,
-                                                    apellido = apellido,
-                                                    email = email
-                                                )
-                                                val response = pasajeroApi.updatePasajero(pasajero.id, pasajeroActualizado)
-                                                if (response.isSuccessful) {
-                                                    pasajeroCreado = pasajeroActualizado
+                                                val actualizado = pasajero.copy(nombre = nombre, apellido = apellido, email = email)
+                                                val resp = pasajeroApi.updatePasajero(pasajero.id, actualizado)
+                                                if (resp.isSuccessful) {
+                                                    pasajeroCreado = actualizado
                                                     modoEditar = false
+                                                } else {
+                                                    // 🆕 Mostrar error si falla la actualización
+                                                    snackbarHostState.showSnackbar("❌ Error al guardar los cambios")
                                                 }
                                             }
                                         } catch (e: Exception) {
-                                            // Manejo de error general
+                                            snackbarHostState.showSnackbar("🔥 ${e.localizedMessage}")
                                         }
                                     }
                                 }) {
@@ -169,24 +154,72 @@ fun ReservaBilleteScreen(navController: NavHostController, autobusId: Long){
                         }
                     },
                     confirmButton = {
-                        Button(onClick = {
-                            confirmacion = false
-                            busReservado = null
-                            nombre = ""
-                            apellido = ""
-                            email = ""
-                            modoEditar = false
-                            navController.navigate("confirmacion") //solo despues de editar
-                        }) {
-                            Text("Confirmar")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        try {
+                                            pasajeroCreado?.let { pasajero ->
+                                                val deleteResp = pasajeroApi.deletePasajero(pasajero.id)
+                                                if (deleteResp.isSuccessful) {
+                                                    // 🆕 Mostrar mensaje de éxito al eliminar
+                                                    snackbarHostState.showSnackbar("✅ Pasajero eliminado correctamente")
+
+                                                    // Limpiar datos locales
+                                                    confirmacion = false
+                                                    busReservado = null
+                                                    nombre = ""
+                                                    apellido = ""
+                                                    email = ""
+                                                    pasajeroCreado = null
+                                                    modoEditar = false
+                                                } else {
+                                                    // mostrar error si la API no responde bien
+                                                    snackbarHostState.showSnackbar("❌ No se pudo eliminar el pasajero")
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            // mostrar excepción si hay un fallo grave
+                                            snackbarHostState.showSnackbar("🔥 Error: ${e.localizedMessage}")
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Eliminar")
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Button(
+                                onClick = {
+                                    confirmacion = false
+                                    busReservado = null
+                                    nombre = ""
+                                    apellido = ""
+                                    email = ""
+                                    modoEditar = false
+                                    navController.navigate("confirmacion")
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF1A237E),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Confirmar")
+                            }
                         }
                     }
-
                 )
             }
         }
     }
 }
-
-
-
