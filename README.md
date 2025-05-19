@@ -26,6 +26,8 @@ Eliminar un pasajero y billete.
 
 La rubrica esta adjuntada en imagenes.
 
+Link del video -> https://eepmad-my.sharepoint.com/:v:/g/personal/diana-polo1_eep-igroup_com/EQPfB5X5_z5OjYE1AjJbIYEBvLFI6sZF5om2gZXukfc4fg?e=UMAnZ0&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D
+
 
 
 
